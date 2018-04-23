@@ -13,30 +13,83 @@
  */
 
 /**
- * Write your model definitions here
+ * Construction model definitions
  */
 
 namespace org.acme.construction
 
-participant SampleParticipant identified by participantId {
+participant ContructionParticipant identified by participantId {
   o String participantId
   o String firstName
   o String lastName
+  o Double balance
 }
 
-asset SampleAsset identified by assetId {
+participant Owner extends ContructionParticipant {
+}
+
+participant Architect extends ContructionParticipant {
+}
+
+participant Builder extends ContructionParticipant {
+}
+
+participant Manufacturer extends ContructionParticipant {
+}
+
+participant Inspector extends ContructionParticipant {
+}
+
+asset ConstructionAsset identified by assetId {
   o String assetId
-  --> SampleParticipant owner
-  o String value
+  o String name
+  --> ContructionParticipant owner
 }
 
-transaction SampleTransaction {
-  --> SampleAsset asset
-  o String newValue
+enum BuildingMaterialCategory {
+  o COMPOSITES
+  o CONCRETE
+  o DOORS
+  o ELECTRICAL_STSYEMS
+  o FLOORS
+  o HVAC
+  o MASONRY
+  o METALS
+  o PLASTICS
+  o PLUMBING
+  o STEEL_FRAMES
+  o WINDOWS
+  o WOOD
 }
 
-event SampleEvent {
-  --> SampleAsset asset
-  o String oldValue
-  o String newValue
+enum BuildingMaterialStatus {
+  o ORDERED
+  o SHIPPING
+  o DELIVERED
+  o NONE
 }
+
+asset BuildingMaterial extends ConstructionAsset {
+  o BuildingMaterialCategory category
+  o BuildingMaterialStatus status
+  o Double cost
+}
+
+asset Fund extends ConstructionAsset {
+  o Double amount
+}
+
+transaction DeliverMaterial {
+  --> Manufacturer owner
+}
+
+transaction DepositFund {
+  --> Owner owner
+  o Double amount
+}
+
+transaction FinishWork {
+  --> Builder builder
+  o String detail
+}
+
