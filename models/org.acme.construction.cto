@@ -42,6 +42,7 @@ participant Inspector extends ContructionParticipant {
 
 asset ConstructionAsset identified by assetId {
   o String assetId
+  o String name
   --> ContructionParticipant owner
 }
 
@@ -66,20 +67,42 @@ enum BuildingMaterialStatus {
   o SHIPPING
   o DELIVERED
   o INSPECTED
-  o NONE
 }
 
 asset BuildingMaterial extends ConstructionAsset {
   o BuildingMaterialCategory category
   o BuildingMaterialStatus status
-  o String description
   o String deliverDateTime
   o String inspectDateTime
   o Double cost
 }
 
+enum ConstructionType {
+  o RENOVATION
+  o DEMOLITION
+  o SITE_WORK
+  o PAVING
+  o SERVICE_MAINTENANCE
+}
+
+enum WorkStatus {
+  o STARTED
+  o PAUSED
+  o DELAYED
+  o COMPLETED
+  o INSPECTED
+}
+
+asset Work extends ConstructionAsset {
+  o ConstructionType type
+  o WorkStatus status
+  o String finishDateTime
+  o String inspectDateTime
+  o Double cost
+}
+
 asset Fund extends ConstructionAsset {
-  o Double amount
+  o Double balance
 }
 
 transaction DeliverMaterial {
@@ -91,7 +114,9 @@ transaction InspectMaterial {
 }
 
 transaction FinishWork {
-  o String detail
-  --> Builder builder
+  --> Work work
 }
 
+transaction InspectWork {
+  --> Work work
+}
