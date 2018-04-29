@@ -20,8 +20,7 @@ namespace org.acme.construction
 
 participant ContructionParticipant identified by participantId {
   o String participantId
-  o String firstName
-  o String lastName
+  o String name
   o Double balance
 }
 
@@ -42,8 +41,7 @@ participant Inspector extends ContructionParticipant {
 
 asset ConstructionAsset identified by assetId {
   o String assetId
-  o String name
-  --> ContructionParticipant owner
+  o String description
 }
 
 enum BuildingMaterialCategory {
@@ -66,6 +64,7 @@ enum BuildingMaterialStatus {
   o ORDERED
   o SHIPPING
   o DELIVERED
+  o RETURNED
   o INSPECTED
 }
 
@@ -75,6 +74,7 @@ asset BuildingMaterial extends ConstructionAsset {
   o String deliverDateTime
   o String inspectDateTime
   o Double cost
+  --> Manufacturer owner
 }
 
 enum ConstructionType {
@@ -85,24 +85,27 @@ enum ConstructionType {
   o SERVICE_MAINTENANCE
 }
 
-enum WorkStatus {
+enum ConstructionWorkStatus {
   o STARTED
   o PAUSED
   o DELAYED
   o COMPLETED
+  o INCOMPLETED
   o INSPECTED
 }
 
-asset Work extends ConstructionAsset {
+asset ConstructionWork extends ConstructionAsset {
   o ConstructionType type
-  o WorkStatus status
+  o ConstructionWorkStatus status
   o String finishDateTime
   o String inspectDateTime
   o Double cost
+  --> Builder owner
 }
 
-asset Fund extends ConstructionAsset {
+asset ConstructionFund extends ConstructionAsset {
   o Double balance
+  --> Owner owner
 }
 
 transaction DeliverMaterial {
@@ -110,13 +113,15 @@ transaction DeliverMaterial {
 }
 
 transaction InspectMaterial {
+  o BuildingMaterialStatus newStatus
   --> BuildingMaterial material
 }
 
 transaction FinishWork {
-  --> Work work
+  --> ConstructionWork work
 }
 
 transaction InspectWork {
-  --> Work work
+  o ConstructionWorkStatus newStatus
+  --> ConstructionWork work
 }
