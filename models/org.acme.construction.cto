@@ -18,28 +18,25 @@
 
 namespace org.acme.construction
 
-participant ContructionParticipant identified by participantId {
+participant ConstructionParticipant identified by participantId {
   o String participantId
   o String name
   o Double balance
 }
 
-participant Owner extends ContructionParticipant {
+participant Owner extends ConstructionParticipant {
 }
 
-participant Architect extends ContructionParticipant {
+participant Architect extends ConstructionParticipant {
 }
 
-participant Builder extends ContructionParticipant {
+participant GeneralContractor extends ConstructionParticipant {
 }
 
-participant GeneralContractor extends Builder {
+participant SubContractor extends ConstructionParticipant {
 }
 
-participant SubContractor extends Builder {
-}
-
-participant Manufacturer extends ContructionParticipant {
+participant Manufacturer extends ConstructionParticipant {
 }
 
 asset ConstructionAsset identified by assetId {
