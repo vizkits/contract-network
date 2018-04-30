@@ -33,10 +33,13 @@ participant Architect extends ContructionParticipant {
 participant Builder extends ContructionParticipant {
 }
 
-participant Manufacturer extends ContructionParticipant {
+participant GeneralContractor extends Builder {
 }
 
-participant Inspector extends ContructionParticipant {
+participant SubContractor extends Builder {
+}
+
+participant Manufacturer extends ContructionParticipant {
 }
 
 asset ConstructionAsset identified by assetId {
@@ -73,8 +76,9 @@ asset BuildingMaterial extends ConstructionAsset {
   o BuildingMaterialStatus status
   o String deliverDateTime
   o String inspectDateTime
-  o Double cost
-  --> Manufacturer owner
+  o Double price
+  --> Manufacturer supplier
+  --> GeneralContractor inspector
 }
 
 enum ConstructionType {
@@ -96,16 +100,82 @@ enum ConstructionWorkStatus {
 
 asset ConstructionWork extends ConstructionAsset {
   o ConstructionType type
-  o ConstructionWorkStatus status
+  o ConstructionWorkStatus status default = "STARTED"
   o String finishDateTime
   o String inspectDateTime
   o Double cost
-  --> Builder owner
+  --> SubContractor builder
+  --> GeneralContractor inspector
 }
 
 asset ConstructionFund extends ConstructionAsset {
   o Double balance
   --> Owner owner
+}
+
+enum BudgetStatus {
+  o DRAFT
+  o APPROVED
+  o EXECUTED
+  o OPEN
+  o REJECTED
+  o SUBMITTED
+  o VOID
+}
+
+enum CostStatus {
+  o DRAFT
+  o APPROVED
+  o EXECUTED
+  o OPEN
+  o PRICING
+  o PROPOSED
+  o REJECTED
+  o REVISING
+  o VOID
+}
+
+asset CostItem extends ConstructionAsset {
+  o String title
+  o String budgetCode
+  o BudgetStatus budgetStatus default = "DRAFT"
+  o CostStatus costStatus default = "DRAFT"
+  o Double amount
+  o Double estimatedAmount
+  o Double proposedAmount
+  o Double submittedAmount
+  o Double approvedAmount
+  o Double commitedAmount
+  o String scopeOfWork
+  o String approveDateTime
+}
+
+asset ChangeOrder extends ConstructionAsset {
+  o BudgetStatus budgetStatus default = "DRAFT"
+  o CostStatus costStatus default = "DRAFT"
+  o CostItem[] scopeOfWork
+  o String createDateTime
+  o String submitDateTime
+}
+
+asset RequestChangeOrder extends ChangeOrder {
+  o Double total
+  --> GeneralContractor from
+  --> Owner to
+}
+
+enum OCOStatus {
+  o APPROVED
+  o PENDING_APPROVAL
+  o REJECTED
+}
+
+asset OwnerChangeOrder extends ChangeOrder {
+  o Double approveAmount
+  o String approveDateTime
+  o OCOStatus status
+  --> Owner from
+  --> GeneralContractor to
 }
 
 transaction DeliverMaterial {
@@ -115,6 +185,7 @@ transaction DeliverMaterial {
 transaction InspectMaterial {
   o BuildingMaterialStatus newStatus
   --> BuildingMaterial material
+  --> GeneralContractor inspector
 }
 
 transaction FinishWork {
@@ -124,4 +195,12 @@ transaction FinishWork {
 transaction InspectWork {
   o ConstructionWorkStatus newStatus
   --> ConstructionWork work
+  --> GeneralContractor inspector
+}
+
+transaction ProcessRCO {
+  o Double approveAmount
+  o OCOStatus status
+  --> RequestChangeOrder rco
+  --> Owner approver
 }
