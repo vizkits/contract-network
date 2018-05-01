@@ -5,6 +5,8 @@
   "scripts": {
     "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/contract-network.bna",
     "pretest": "npm run lint",
+    "archive": "composer archive create -t dir -n .",
+    "deploy": "composer network install --card PeerAdmin@hlfv1 --archiveFile contract-network@0.0.16.bna && composer network start --networkName contract-network --networkVersion 0.0.16 --networkAdmin admin --networkAdminEnrollSecret adminpw --card PeerAdmin@hlfv1",
     "lint": "eslint .",
     "test": "nyc mocha -t 0 test/*.js && cucumber-js"
   },
