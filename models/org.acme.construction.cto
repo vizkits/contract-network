@@ -155,22 +155,22 @@ asset ChangeOrder extends ConstructionAsset {
   o String submitDateTime
 }
 
+enum ChangeOrderStatus {
+  o APPROVED
+  o PENDING_APPROVAL
+  o REJECTED
+}
+
 asset RequestChangeOrder extends ChangeOrder {
   o Double total
   --> GeneralContractor from
   --> Owner to
 }
 
-enum OCOStatus {
-  o APPROVED
-  o PENDING_APPROVAL
-  o REJECTED
-}
-
 asset OwnerChangeOrder extends ChangeOrder {
   o Double approveAmount
   o String approveDateTime
-  o OCOStatus status
+  o ChangeOrderStatus status
   --> Owner from
   --> GeneralContractor to
 }
@@ -197,7 +197,7 @@ transaction InspectWork {
 
 transaction ProcessRCO {
   o Double approveAmount
-  o OCOStatus status
+  o ChangeOrderStatus status
   --> RequestChangeOrder rco
   --> Owner approver
 }
